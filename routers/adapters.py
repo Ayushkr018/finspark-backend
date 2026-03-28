@@ -18,14 +18,8 @@ def list_categories():
     return {"categories": sorted(cats)}
 
 
-@router.get("/{adapter_id}")
-def get_adapter(adapter_id: str):
-    adapter = ADAPTERS.get(adapter_id)
-    if not adapter:
-        raise HTTPException(status_code=404, detail=f"Adapter '{adapter_id}' not found.")
-    return adapter
-
-
+# ⚠️ /{adapter_id}/versions MUST come before /{adapter_id}
+# otherwise FastAPI matches "cibil-v3/versions" as adapter_id
 @router.get("/{adapter_id}/versions")
 def get_versions(adapter_id: str):
     adapter = ADAPTERS.get(adapter_id)
@@ -37,3 +31,11 @@ def get_versions(adapter_id: str):
         "current_version": adapter["version"],
         "available_versions": adapter["versions"],
     }
+
+
+@router.get("/{adapter_id}")
+def get_adapter(adapter_id: str):
+    adapter = ADAPTERS.get(adapter_id)
+    if not adapter:
+        raise HTTPException(status_code=404, detail=f"Adapter '{adapter_id}' not found.")
+    return adapter
